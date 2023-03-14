@@ -15,6 +15,7 @@ public class TicketManagerTest {
     TicketEntry ticket6 = new TicketEntry(6, 9001, "MSK", "PET", 303);
 
     TicketEntry ticket7 = new TicketEntry(7, 2501, "MSK", "PET", 731);
+    TicketEntry ticket8 = new TicketEntry(8, 2501, "MSK", "PET", 371);
 
     @Test
     public void shdFindTicketsIfSame() { /** проверяет поиск, если есть совпадения в полях одного билета */
@@ -68,6 +69,35 @@ public class TicketManagerTest {
 
         TicketEntry[] expected = {};
         TicketEntry[] actual = ticketMngr.findAllTicketsByPort("AIU", "IOU");
+
+        Assertions.assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void shdFindTicketsIfSamePrice() { /** если находятся два билета с одинаковой ценой */
+        ticketRepo.addTicketToRepo(ticket2);
+        ticketRepo.addTicketToRepo(ticket3);
+        ticketRepo.addTicketToRepo(ticket4);
+        ticketRepo.addTicketToRepo(ticket5);
+        ticketRepo.addTicketToRepo(ticket8);
+        ticketRepo.addTicketToRepo(ticket7);
+
+        TicketEntry[] expected = {ticket8, ticket7};
+        TicketEntry[] actual = ticketMngr.findAllTicketsByPort("MSK", "PET");
+
+        Assertions.assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void shdFindTicketsIfFirstCheaperThanSecond() { /** если находятся два билета, и 1 дешевле 2*/
+        ticketRepo.addTicketToRepo(ticket1);
+        ticketRepo.addTicketToRepo(ticket3);
+        ticketRepo.addTicketToRepo(ticket4);
+        ticketRepo.addTicketToRepo(ticket5);
+        ticketRepo.addTicketToRepo(ticket6);
+
+        TicketEntry[] expected = {ticket1, ticket6};
+        TicketEntry[] actual = ticketMngr.findAllTicketsByPort("MSK", "PET");
 
         Assertions.assertArrayEquals(expected, actual);
     }

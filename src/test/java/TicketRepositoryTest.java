@@ -66,6 +66,20 @@ public class TicketRepositoryTest {
     }
 
     @Test
+    public void shdRemoveFromRepoByEgoIfNonexistent() {
+        ticketRepo.addTicketToRepo(ticket1);
+        ticketRepo.addTicketToRepo(ticket2);
+        ticketRepo.addTicketToRepo(ticket3);
+        ticketRepo.addTicketToRepo(ticket4);
+        ticketRepo.addTicketToRepo(ticket5);
+
+        TicketEntry[] expected = {ticket1, ticket2, ticket4, ticket5};
+        TicketEntry[] actual = ticketRepo.getTicketDatabase();
+
+        Assertions.assertThrows(NotFoundException.class, () -> {ticketRepo.removeTicketById(13);});
+    }
+
+    @Test
     public void shdFindTicketByEgo() {
         ticketRepo.addTicketToRepo(ticket1);
         ticketRepo.addTicketToRepo(ticket2);
