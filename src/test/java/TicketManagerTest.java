@@ -1,6 +1,8 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Comparator;
+
 public class TicketManagerTest {
 
     TicketRepository ticketRepo = new TicketRepository();
@@ -16,6 +18,7 @@ public class TicketManagerTest {
 
     TicketEntry ticket7 = new TicketEntry(7, 2501, "MSK", "PET", 731);
     TicketEntry ticket8 = new TicketEntry(8, 2501, "MSK", "PET", 371);
+    TicketEntry ticket9 = new TicketEntry(9, 34509, "MSK", "PET", 371);
 
     @Test
     public void shdFindTicketsIfSame() { /** проверяет поиск, если есть совпадения в полях одного билета */
@@ -98,6 +101,72 @@ public class TicketManagerTest {
 
         TicketEntry[] expected = {ticket1, ticket6};
         TicketEntry[] actual = ticketMngr.findAllTicketsByPort("MSK", "PET");
+
+        Assertions.assertArrayEquals(expected, actual);
+    }
+
+    @Test /** #(gottago)FAST */
+    public void shdFindTicketsWithTimeSortNormal() { /** проверяет нормальный случай поиска и сортировки по времени */
+
+        ticketRepo.addTicketToRepo(ticket1); /** время: 300 */
+        ticketRepo.addTicketToRepo(ticket2);
+        ticketRepo.addTicketToRepo(ticket3);
+        ticketRepo.addTicketToRepo(ticket7); /** время: 731 */
+        ticketRepo.addTicketToRepo(ticket8); /** время: 371 */
+
+        TicketByDurationComparator timeCompartr = new TicketByDurationComparator();
+
+        TicketEntry[] expected = {ticket1, ticket8, ticket7};
+        TicketEntry[] actual = ticketMngr.findAllTicketsByPortAndDuration("MSK", "PET", timeCompartr);
+
+        Assertions.assertArrayEquals(expected, actual);
+    }
+
+    @Test /** #(gottago)FAST */
+    public void shdFindTicketsWithTimeSortIfNonexistent() { /** поиск и сортировка при несуществующих кодах */
+
+        ticketRepo.addTicketToRepo(ticket1); /** время: 300 */
+        ticketRepo.addTicketToRepo(ticket2);
+        ticketRepo.addTicketToRepo(ticket3);
+        ticketRepo.addTicketToRepo(ticket7); /** время: 731 */
+        ticketRepo.addTicketToRepo(ticket8); /** время: 371 */
+
+        TicketByDurationComparator timeCompartr = new TicketByDurationComparator();
+
+        TicketEntry[] expected = {};
+        TicketEntry[] actual = ticketMngr.findAllTicketsByPortAndDuration("AOU", "EYI", timeCompartr);
+
+        Assertions.assertArrayEquals(expected, actual);
+    }
+
+    @Test /** #(gottago)FAST */
+    public void shdFindTicketsWithTimeSortIfBothSameTime() { /** поиск и сортировка для двух билетов c одинаковым временем */
+
+        ticketRepo.addTicketToRepo(ticket8); /** время: 371 */
+        ticketRepo.addTicketToRepo(ticket9); /** время: 371 */
+
+        TicketByDurationComparator timeCompartr = new TicketByDurationComparator();
+
+        TicketEntry[] expected = {ticket8, ticket9};
+        TicketEntry[] actual = ticketMngr.findAllTicketsByPortAndDuration("MSK", "PET", timeCompartr);
+
+        Assertions.assertArrayEquals(expected, actual);
+    }
+
+    @Test /** #(gottago)FAST */
+    public void shdFindTicketsWithTimeSortIfOneFieldMatch() { /** если находится только одно поле из запроса */
+        ticketRepo.addTicketToRepo(ticket1); /** время: 300 */
+        ticketRepo.addTicketToRepo(ticket2);
+        ticketRepo.addTicketToRepo(ticket3);
+        ticketRepo.addTicketToRepo(ticket7); /** время: 731 */
+        ticketRepo.addTicketToRepo(ticket8); /** время: 371 */
+        ticketRepo.addTicketToRepo(ticket6); /** время: 303 */
+        ticketRepo.addTicketToRepo(ticket9); /** время: 371 */
+
+        TicketByDurationComparator timeCompartr = new TicketByDurationComparator();
+
+        TicketEntry[] expected = {};
+        TicketEntry[] actual = ticketMngr.findAllTicketsByPortAndDuration("MSK", "WTC", timeCompartr);
 
         Assertions.assertArrayEquals(expected, actual);
     }
