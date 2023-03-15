@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Comparator;
 
 public class TicketManager {
     private TicketRepository ticketRepo;
@@ -35,6 +36,37 @@ public class TicketManager {
             }
         }
         Arrays.sort(resultDatabase); /** добавляем сортировку от меньшего значения (цены) к большей */
+        return resultDatabase;
+    }
+
+    public TicketEntry[] findAllTicketsByPortAndDuration(String whereFrom, String whereTo, Comparator<TicketEntry> timeCompartr) {
+        TicketEntry[] ticketDatabse = ticketRepo.getTicketDatabase();
+        TicketEntry[] bufferDatabase = new TicketEntry[ticketDatabse.length];
+        int pos = 0;
+        int matchCount = 0;
+
+        for (TicketEntry targetTicket : ticketDatabse) {
+            if (targetTicket.getPortDeparture().contains(whereFrom) && targetTicket.getPortArrival().contains(whereTo)) {
+                bufferDatabase[pos] = targetTicket;
+                pos++;
+                matchCount++;
+            } else {
+                pos++;
+            }
+        }
+
+        TicketEntry[] resultDatabase = new TicketEntry[matchCount];
+        int posResult = 0;
+        pos = 0;
+
+        for (pos = 0; pos < bufferDatabase.length; pos++) {
+            if (bufferDatabase[pos] != null) {
+                resultDatabase[posResult] = bufferDatabase[pos];
+                posResult++;
+            }
+        }
+        Arrays.sort(resultDatabase, timeCompartr); /** добавляем альтернативный вариант сортировки - по длительности полёта
+         (также от меньшего к большему) */
         return resultDatabase;
     }
 }
